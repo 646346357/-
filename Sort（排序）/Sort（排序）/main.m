@@ -166,6 +166,46 @@ int partition(int *list, int start, int end, int pivot){
     return i;
 }
 
+#pragma mark - 计数排序
+void countingSort(int* list, int n){//list数组中只能都是非负整数
+    if (n <= 1) {
+        return;
+    }
+    
+    //找到最大值，确定计数范围[0, max]
+    int max = 0;
+    for (int i = 0; i < n; i++) {
+        if (list[i] > max) {
+            max = list[i];
+        }
+    }
+    
+    //创建计数数组,累加求和
+    int *countList = (int *)calloc(max+1, sizeof(*list));
+    for (int i = 0; i < n; i++) {
+        countList[list[i]]++;
+    }
+    for (int i = 1; i < max+1; i++) {
+        countList[i] = countList[i] + countList[i-1];
+    }
+    
+    //创建临时数组，存放排序结果
+    int *tmp = (int *)malloc(sizeof(*list * n));
+    for (int i = 0; i < n; i++) {
+        int index = countList[list[i]]-1;
+        tmp[index] = list[i];
+        countList[list[i]]--;
+    }
+    
+    //把排序结果赋值给原数组
+    for (int i = 0; i < n; i++) {
+        list[i] = tmp[i];
+    }
+    
+    free(countList);
+    free(tmp);
+}
+
 #pragma mark - 工具函数
 //交换数组元素位置
 void swapArray(int *list, int i, int j) {
@@ -253,6 +293,16 @@ int main(int argc, const char * argv[]) {
         printf("排序前：");
         printArray(list, n);
         quickSort(list, n);
+        printf("排序后：");
+        printSortArray(list, n, true);
+        
+        printf("\n\n");
+        printf("计数排序\n");
+        list = (int *)malloc(sizeof(constArray));
+        copyArray(constArray, list, n);
+        printf("排序前：");
+        printArray(list, n);
+        countingSort(list, n);
         printf("排序后：");
         printSortArray(list, n, true);
     }
